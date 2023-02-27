@@ -4,22 +4,43 @@ import { getDataFromServer } from '../services/menu';
 
 function ShowList() {
     const [items, setItems] = useState<IDataList[]>([]);
+    const [error, setError] = useState<Error | null>(null);
+    const [sum, setSum] = useState<number | null>();
+    const [rahulspent, setRahulspent] = useState<number>(0);
+    const [rameshspent, setRameshspent] = useState<number>(0);
+    const [showform, setShowForm] = useState<boolean>(false);
+
+    var rahulspent1: number = 0;
+    var rameshspent1: number = 0;
 
     useEffect(() => {
         const getExpenseData = async () => {
             try {
                 const expenseData = await getDataFromServer();
-                console.log(expenseData);
                 setItems(expenseData);
-            } catch (error) {
-
+                setSum(expenseData.reduce((result, v) => (result = result + v.price), 0));
+                Shares(expenseData);
+            } catch (error: any) {
+                setError(error);
             } finally {
 
             }
         };
 
         getExpenseData();
-    }, []);
+    }, [showform]);
+
+    const Shares = (expenseData: IDataList[]) => {
+        expenseData.map((item) =>
+            item.payeeName === "Rahul"
+                ? (rahulspent1 += item.price)
+                : (rameshspent1 += item.price)
+
+
+        );
+        setRahulspent(rahulspent1);
+        setRameshspent(rameshspent1);
+    };
 
     return (
         <>
@@ -28,7 +49,7 @@ function ShowList() {
             <div className="use-inline price header-color">Price</div>
             <div className="use-inline header-color" style={{ width: 112 }}>Payee</div>
             {
-                items && 
+                items &&
                 items.map((item: IDataList, idx) => (
 
                     <div key={idx}>
@@ -39,9 +60,22 @@ function ShowList() {
                     </div>
                 ))
             }
-            <hr/>
+            <hr />
+            <div className="use-inline">Total: </div>
+            <span className="use-inline total">{sum}</span><br />
+            <div className="use-inline">Rahul Paid: </div>
+            <span className="use-inline total Rahul">{rahulspent}</span><br />
+            <span className="use-inline">Ramesh paid: </span>
+            <span className="use-inline total Ramesh">{rameshspent}</span><br />
+            <span className="use-inline payable">
+                {rahulspent > rameshspent ? "Pay Rahul" : "Pay Ramesh"}
+            </span>
+            <span className="use-inline payable price">
+                {" "}
+                {Math.abs((rahulspent - rameshspent) / 2)}
+            </span>
         </>
-        
+
     );
 }
 
