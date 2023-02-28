@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import IDataList from '../models/IDataList';
 import { getDataFromServer } from '../services/menu';
+import ExpenseTracker from './ExpenseTracker';
 
 function ShowList() {
     const [items, setItems] = useState<IDataList[]>([]);
@@ -42,12 +43,29 @@ function ShowList() {
         setRameshspent(rameshspent1);
     };
 
+    const success = () => {
+        setShowForm(false);
+    };
+
+    const cancel = () => {
+        setShowForm(false);
+    };
+
     return (
         <>
-            <div className="use-inline date header-color">Date</div>
-            <div className="use-inline header-color">Product Purchased</div>
-            <div className="use-inline price header-color">Price</div>
-            <div className="use-inline header-color" style={{ width: 112 }}>Payee</div>
+            <header id="page-Header">Expense Tracker</header>
+            <button id="Add-Button" onClick={() => setShowForm(true)}> Add</button>
+            {showform && (
+                <div className="form">
+                    <ExpenseTracker onTrue={success} onClose={cancel} />
+                </div>
+            )}
+            <>
+                <div className="use-inline date header-color">Date</div>
+                <div className="use-inline header-color">Product Purchased</div>
+                <div className="use-inline price header-color">Price</div>
+                <div className="use-inline header-color" style={{ width: 112 }}>Payee</div>
+            </>
             {
                 items &&
                 items.map((item: IDataList, idx) => (
@@ -74,6 +92,7 @@ function ShowList() {
                 {" "}
                 {Math.abs((rahulspent - rameshspent) / 2)}
             </span>
+            {error && <>{error?.message}</>}
         </>
 
     );
